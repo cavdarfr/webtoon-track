@@ -27,7 +27,9 @@ model Webtoon {
   title     String
   url       String?
   status    String?
+  image     String? // Base64 encoded image or file path
   authorId  String   @db.ObjectId
   author    User     @relation(fields: [authorId], references: [id])
   createdAt DateTime @default(now())
+  tags      String[]
 }

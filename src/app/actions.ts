@@ -43,26 +43,53 @@ export async function createWebtoon({
     url,
     status,
     authorId,
+    tags,
+    image,
 }: {
     title: string;
     url?: string;
     status?: string;
     authorId: string;
+    tags?: string[];
+    image?: string;
 }) {
     return prisma.webtoon.create({
-        data: { title, url, status, authorId },
+        data: {
+            title,
+            url,
+            status,
+            authorId,
+            image,
+            ...(tags ? { tags: { set: tags } } : {}),
+        },
     });
 }
 
-export async function getWebtoons() {
-    return prisma.webtoon.findMany({ include: { author: true } });
+export async function getWebtoons(authorId: string) {
+    return prisma.webtoon.findMany({
+        where: { authorId },
+        orderBy: { createdAt: "desc" },
+    });
 }
 
 export async function updateWebtoon(
     id: string,
-    data: { title?: string; url?: string; status?: string }
+    data: {
+        title?: string;
+        url?: string;
+        status?: string;
+        tags?: string[];
+        image?: string;
+    }
 ) {
-    return prisma.webtoon.update({ where: { id }, data });
+    const { tags, ...rest } = data;
+    return prisma.webtoon.update({
+        where: { id },
+        data: {
+            ...rest,
+            ...(tags ? { tags: { set: tags } } : {}),
+        },
+    });
 }
 
 export async function deleteWebtoon(id: string) {
